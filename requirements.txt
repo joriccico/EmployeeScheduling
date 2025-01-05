@@ -1,0 +1,3 @@
+ortools        # Para el módulo cp_model y funciones de optimización
+absl-py        # Para manejar parámetros y flags de línea de comandos
+protobuf       # Para trabajar con la serialización en formato protobuf
