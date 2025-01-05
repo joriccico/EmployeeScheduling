@@ -1,7 +1,7 @@
 from ortools.sat.python import cp_model
-from constraint import ShiftConstraint
+from constraint import Constraint
 
-class ShiftSchedulingModel:
+class Model:
     """Encapsula la creación del modelo de programación de turnos."""
 
     def __init__(self, num_employees, num_weeks):
@@ -60,7 +60,7 @@ class ShiftSchedulingModel:
             shift, hard_min, soft_min, min_cost, soft_max, hard_max, max_cost = ct
             for e in range(self.num_employees):
                 works = [self.work[e, shift, d] for d in range(self.num_days)]
-                variables, coeffs = ShiftConstraint.add_soft_sequence_constraint(
+                variables, coeffs = Constraint.add_soft_sequence_constraint(
                     self.model,
                     works,
                     hard_min,
@@ -81,7 +81,7 @@ class ShiftSchedulingModel:
             for e in range(self.num_employees):
                 for w in range(self.num_weeks):
                     works = [self.work[e, shift, d + w * 7] for d in range(7)]
-                    variables, coeffs = ShiftConstraint.add_soft_sum_constraint(
+                    variables, coeffs = Constraint.add_soft_sum_constraint(
                         self.model,
                         works,
                         hard_min,

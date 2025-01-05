@@ -1,7 +1,7 @@
 from ortools.sat.python import cp_model
 from google.protobuf import text_format
 
-class ShiftSchedulingSolver:
+class Solver:
     """Se encarga de resolver el problema del modelo."""
 
     def __init__(self, model):

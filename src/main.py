@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
 from absl import app, flags
-from model import ShiftSchedulingModel
-from solver import ShiftSchedulingSolver
+from model import Model
+from solver import Solver
 from data_conversion import create_shift_constraint, create_request, create_penalized_transition, create_weekly_sum_constraint, create_daily_demand, create_fixed_assignment
 
 # Definiciones de los parámetros de la línea de comandos
@@ -71,7 +69,7 @@ def main(_):
     excess_cover_penalties = (2, 2, 5)
 
     # Inicializar modelo
-    model = ShiftSchedulingModel(num_employees, num_weeks)
+    model = Model(num_employees, num_weeks)
     model.initialize_variables()
     model.add_constraints(fixed_assignments, requests, shift_constraints, weekly_constraints, penalized_transitions,
                           weekly_cover_demands, excess_cover_penalties)
@@ -82,7 +80,7 @@ def main(_):
     model.set_objective()
 
     # Resolver modelo
-    solver = ShiftSchedulingSolver(model)
+    solver = Solver(model)
     status = solver.solve(_PARAMS.value, _OUTPUT_PROTO.value)
     solver.print_solution(status)
 

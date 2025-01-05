@@ -1,6 +1,6 @@
 from ortools.sat.python import cp_model
 
-class ShiftConstraint:
+class Constraint:
     """Clase para métodos estáticos relacionados con restricciones."""
 
     @staticmethod
@@ -79,13 +79,13 @@ class ShiftConstraint:
         # Forbid sequences that are too short.
         for length in range(1, hard_min):
             for start in range(len(works) - length + 1):
-                model.add_bool_or(ShiftConstraint.negated_bounded_span(works, start, length))
+                model.add_bool_or(Constraint.negated_bounded_span(works, start, length))
 
         # Penalize sequences that are below the soft limit.
         if min_cost > 0:
             for length in range(hard_min, soft_min):
                 for start in range(len(works) - length + 1):
-                    span = ShiftConstraint.negated_bounded_span(works, start, length)
+                    span = Constraint.negated_bounded_span(works, start, length)
                     name = f": under_span(start={start}, length={length})"
                     lit = model.new_bool_var(prefix + name)
                     span.append(lit)
@@ -99,7 +99,7 @@ class ShiftConstraint:
         if max_cost > 0:
             for length in range(soft_max + 1, hard_max + 1):
                 for start in range(len(works) - length + 1):
-                    span = ShiftConstraint.negated_bounded_span(works, start, length)
+                    span = Constraint.negated_bounded_span(works, start, length)
                     name = f": over_span(start={start}, length={length})"
                     lit = model.new_bool_var(prefix + name)
                     span.append(lit)
