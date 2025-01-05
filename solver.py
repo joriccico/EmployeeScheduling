@@ -1,22 +1,55 @@
 from ortools.sat.python import cp_model
+from google.protobuf import text_format
 
+class ShiftSchedulingSolver:
+    """Se encarga de resolver el problema del modelo."""
 
-def solve_model(model, work, data, obj_bool_vars, obj_bool_coeffs, obj_int_vars, obj_int_coeffs):
-    solver = cp_model.CpSolver()
-    solution_printer = cp_model.ObjectiveSolutionPrinter()
-    status = solver.solve(model, solution_printer)
+    def __init__(self, model):
+        self.model = model
+        self.solver = cp_model.CpSolver()
 
-    if status in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        print("Solution:")
-        for e in range(data.num_employees):
-            schedule = ""
-            for d in range(data.num_days):
-                for s in range(data.num_shifts):
-                    if solver.boolean_value(work[e, s, d]):
-                        schedule += data.shifts[s] + " "
-            print(f"Worker {e}: {schedule}")
-        print("\nPenalties:")
-        for i, var in enumerate(obj_bool_vars):
-            if solver.boolean_value(var):
-                penalty = obj_bool_coeffs[i]
-                print(f"  {var.name}: {penalty}")
+    def solve(self, params, output_proto):
+        """Resuelve el modelo especificado."""
+        if output_proto:
+            print(f"Writing proto to {output_proto}")
+            with open(output_proto, "w") as text_file:
+                text_file.write(str(self.model.model))
+        if params:
+            text_format.Parse(params, self.solver.parameters)
+        solution_printer = cp_model.ObjectiveSolutionPrinter()
+        return self.solver.solve(self.model.model, solution_printer)
+
+    def print_solution(self, status):
+        """Imprime la solución en caso de ser óptima o factible."""
+        if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+            print()
+            header = "          "
+            for w in range(self.model.num_weeks):
+                header += "M T W T F S S "
+            print(header)
+            for e in range(self.model.num_employees):
+                schedule = ""
+                for d in range(self.model.num_days):
+                    for s in range(self.model.num_shifts):
+                        if self.solver.boolean_value(self.model.work[e, s, d]):
+                            schedule += self.model.shifts[s] + " "
+                print(f"worker {e}: {schedule}")
+
+            # Imprimir penalizaciones
+            print("\nPenalties:")
+            for i, var in enumerate(self.model.obj_bool_vars):
+                if self.solver.boolean_value(var):
+                    penalty = self.model.obj_bool_coeffs[i]
+                    if penalty > 0:
+                        print(f"  {var.name} violated, penalty={penalty}")
+                    else:
+                        print(f"  {var.name} fulfilled, gain={-penalty}")
+
+            for i, int_var in enumerate(self.model.obj_int_vars):
+                if self.solver.value(int_var) > 0:
+                    penalty = self.model.obj_int_coeffs[i]
+                    print(f"  {int_var.Name()} violated by {self.solver.value(int_var)}, linear penalty={penalty}")
+
+        # Agregar el resumen de la respuesta del solver
+        print(self.solver.ResponseStats())
+
