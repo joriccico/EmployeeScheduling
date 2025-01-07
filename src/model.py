@@ -9,7 +9,8 @@ class Model:
         self.num_employees = num_employees
         self.num_weeks = num_weeks
         self.num_days = num_weeks * 7
-        self.shifts = ["O", "M", "A", "N"]
+        self.day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        self.shifts = ["Off", "Morning", "Afternoon", "Night"] #["O", "M", "A", "N"]
         self.num_shifts = len(self.shifts)
         self.model = cp_model.CpModel()
         self.work = {}

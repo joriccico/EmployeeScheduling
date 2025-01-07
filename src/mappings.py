@@ -6,3 +6,4 @@ class Mappings:
         "Pepito": 0, "Juanita": 1, "Carlos": 2, "Ana": 3,
         "Maria": 4, "Miguel": 5, "Juan": 6, "Sara": 7
     }
+    ID_TO_WORKER = {v: k for k, v in EMPLOYEES.items()}
