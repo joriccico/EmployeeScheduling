@@ -11,11 +11,13 @@ _PARAMS = flags.DEFINE_string(
     "params", "max_time_in_seconds:2.0", "Sat solver parameters."
 )
 
+
 def main(_):
     # Datos originales del problema
     num_employees = 8
-    num_weeks = 3
+    num_weeks = 3 # Setmanes per predir
 
+    # Torns fixos (obligats)
     fixed_assignments = [
         create_fixed_assignment("Pepito", "libre", "lunes"),
         create_fixed_assignment("Juanita", "libre", "lunes"),
@@ -35,47 +37,59 @@ def main(_):
         create_fixed_assignment("Sara", "noche", "martes"),
     ]
 
+    # Preferències dels treballadors. IMPORTANT: Negatiu -> Torn desitjat. Positiu -> Torn no desitjat
     requests = [
         create_request("Ana", "libre", "sábado", -2),
         create_request("Miguel", "noche", "jueves", -2),
         create_request("Carlos", "noche", "viernes", 4),
     ]
 
+    # Mínim i màxim de torns del mateix tipus (per exemple matí) en dies consecutius
     shift_constraints = [
+        # Dies lliures consecutius: Obligat -> Entre 1 i 2. Preferència -> Entre 1 i 2 (penalització: 0 | 0)
         create_shift_constraint("libre", 1, 1, 0, 2, 2, 0),
+
+        # Torns de nit consecutius: Obligat -> Entre 1 i 4. Preferència -> Entre 2 i 3 (penalització: 20 | 5)
         create_shift_constraint("noche", 1, 2, 20, 3, 4, 5),
     ]
 
+    # Mínim i màxim de torns del mateix tipus (per exemple matí) en la mateixa setmana
     weekly_constraints = [
+        # Dies lliures setmanals: Obligat -> Entre 1 i 3. Preferència -> Entre 2 i 2 (penalització: 7 | 4)
         create_weekly_sum_constraint("libre", 1, 2, 7, 2, 3, 4),
+
+        # Dies lliures setmanals: Obligat -> Entre 0 i 4. Preferència -> Entre 1 i 4 (penalització: 3 | 0)
         create_weekly_sum_constraint("noche", 0, 1, 3, 4, 4, 0),
     ]
 
+    # Transicions de torn en dies consecutius penalitzades. IMPORTANT: 0 vol dir prohibit (màxima penalització)
     penalized_transitions = [
+        # Canvi de tarda a nit té penalització de 4 (avui torn de tarda, demà torn de nit té una penalització de 4)
         create_penalized_transition("tarde", "noche", 4),
+
+        # Canvi de nit a matí té penalització de 0 (avui torn de nit, demà torn de matí prohibit)
         create_penalized_transition("noche", "mañana", 0),
     ]
 
+    # Nombre de persones per torn (obligades)
     weekly_cover_demands = [
-        create_daily_demand(2, 3, 1),  # Lunes
-        create_daily_demand(2, 3, 1),  # Martes
-        create_daily_demand(2, 2, 2),  # Miércoles
-        create_daily_demand(2, 3, 1),  # Jueves
-        create_daily_demand(2, 2, 2),  # Viernes
-        create_daily_demand(1, 2, 3),  # Sábado
-        create_daily_demand(1, 3, 1),  # Domingo
+        create_daily_demand(2, 3, 1),  # Dilluns. 2 matí, 3 tarda, 1 nit
+        create_daily_demand(2, 3, 1),  # Dimarts. 2 matí, 3 tarda, 1 nit
+        create_daily_demand(2, 2, 2),  # Dimecres. 2 matí, 2 tarda, 2 nit
+        create_daily_demand(2, 3, 1),  # Dijous. 2 matí, 3 tarda, 1 nit
+        create_daily_demand(2, 2, 2),  # Divendres. 2 matí, 2 tarda, 2 nit
+        create_daily_demand(1, 2, 3),  # Dissabte. 1 matí, 2 tarda, 3 nit
+        create_daily_demand(1, 3, 1),  # Diumenge. 1 matí, 3 tarda, 1 nit
     ]
 
-    excess_cover_penalties = (2, 2, 5)
+    # Penalització per excés de personal en (matí, tarda, nit)
+    excess_cover_penalties = (2, 2, 5) # Excés de personal en el torn de nit penalitza més que els torns de matí i tarda
 
     # Inicializar modelo
     model = Model(num_employees, num_weeks)
     model.initialize_variables()
     model.add_constraints(fixed_assignments, requests, shift_constraints, weekly_constraints, penalized_transitions,
                           weekly_cover_demands, excess_cover_penalties)
-
-    #model.obj_bool_coeffs = [coef // 2 for coef in model.obj_bool_coeffs]
-    #model.obj_int_coeffs = [coef // 2 for coef in model.obj_int_coeffs]
 
     model.set_objective()
 
