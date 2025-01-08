@@ -64,10 +64,10 @@ def main(_):
 
     # Transicions de torn en dies consecutius penalitzades. IMPORTANT: 0 vol dir prohibit (màxima penalització)
     penalized_transitions = [
-        # Canvi de tarda a nit té penalització de 4 (avui torn de tarda, demà torn de nit té una penalització de 4)
+        # Tarda a nit té penalització de 4 (avui torn de tarda, demà torn de nit té una penalització de 4)
         create_penalized_transition("tarde", "noche", 4),
 
-        # Canvi de nit a matí té penalització de 0 (avui torn de nit, demà torn de matí prohibit)
+        # Nit a matí té penalització de 0 (avui torn de nit, demà torn de matí prohibit)
         create_penalized_transition("noche", "mañana", 0),
     ]
 
@@ -96,6 +96,8 @@ def main(_):
     # Resolver modelo
     solver = Solver(model)
     status = solver.solve(_PARAMS.value, _OUTPUT_PROTO.value)
+    print()
+    solver.print_fixed_assignments(fixed_assignments)
     solver.print_solution(status)
 
 
