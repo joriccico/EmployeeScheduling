@@ -72,7 +72,7 @@ class Solver:
             header += " | ".join(f"{day:<11}" for day in self.model.day_names)
             header += " |"
             print(header)
-            print("—" * len(header))  # Línea horizontal que cruza todo el ancho del encabezado
+            print("—" * len(header))  # Línea horizontal que cruza el ancho del encabezado
 
             # Imprime los turnos para cada día de la semana
             previous_group = None  # Para comprobar el grupo de turnos
