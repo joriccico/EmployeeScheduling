@@ -25,35 +25,42 @@ class Solver:
         """Imprime las asignaciones fijas antes de resolver el problema."""
         print("=== Fixed Assignments ===")
 
-        header = " " * 15 + "| "  # Espaciado inicial para alineación correcta
-        header += " | ".join(f"{day:<11}" for day in self.model.day_names)
-        header += " |"
-        print(header)
-        print("—" * len(header))  # Línea horizontal que cruza todo el ancho del encabezado
+        num_days = 7
+        num_weeks = (max(day for _, _, day in fixed_assignments) // num_days) + 1  # Calcular cuántas semanas
+        fixed_schedule = {shift_name: [[] for _ in range(num_days * num_weeks)] for shift_name in
+                          Mappings.ID_TO_SHIFT.values()}
 
-        # Agrupar las asignaciones fijas por turnos y luego por días
-        fixed_schedule = {shift_name: [[] for _ in range(7)] for shift_name in Mappings.ID_TO_SHIFT.values()}
-
+        # Agrupar las asignaciones fijas por turno y día
         for emp_id, shift_id, day in fixed_assignments:
-            shift_name = Mappings.ID_TO_SHIFT[shift_id]  # Convierte el ID del turno al nombre (ej: "Morning")
-            fixed_schedule[shift_name][day].append(
-                Mappings.ID_TO_WORKER[emp_id])  # Añade al empleado al día correspondiente
+            shift_name = Mappings.ID_TO_SHIFT[shift_id]
+            fixed_schedule[shift_name][day].append(Mappings.ID_TO_WORKER[emp_id])
 
-        # Imprimir cada turno por separado
-        for shift_name, rows in fixed_schedule.items():
+        # Imprimir por cada semana
+        for week in range(num_weeks):
+            print(f"Week {week + 1}")
+            # Crear encabezado
+            header = " " * 15 + "| "
+            header += " | ".join(f"{day:<11}" for day in self.model.day_names)
+            header += " |"
+            print(header)
+            print("—" * len(header))  # Línea horizontal que cruza todo el ancho del encabezado
 
-            max_lines = max(len(rows[day]) for day in range(7))  # Filas necesarias para cada día
-            for line in range(max_lines):
-                row = f"{shift_name:<15}" if line == 0 else " " * 15  # Imprimir el turno una vez
-                row += "| "
-                for day in range(7):
-                    if line < len(rows[day]):  # Hay un empleado asignado
-                        row += f"{rows[day][line]:<11} | "
-                    else:  # Espacio vacío
-                        row += " " * 11 + " | "
-                print(row)
+            # Imprimir cada turno por separado
+            for shift_name, rows in fixed_schedule.items():
+                max_lines = max(len(rows[day]) for day in range(week * num_days, (week + 1) * num_days))
+                for line in range(max_lines):
+                    row = f"{shift_name:<15}" if line == 0 else " " * 15  # Imprimir el turno una vez
+                    row += "| "
+                    for day in range(week * num_days, (week + 1) * num_days):
+                        if line < len(rows[day]):  # Hay un empleado asignado
+                            row += f"{rows[day][line]:<11} | "
+                        else:  # Espacio vacío
+                            row += " " * 11 + " | "
+                    print(row)
 
-            print("—" * len(header))  # Separador después de cada turno
+                print("—" * len(header))  # Separador después de cada turno
+
+            print()  # Separación visual entre semanas
 
     def print_solutionSchedule(self):
         # Imprime por semana

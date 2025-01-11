@@ -21,7 +21,7 @@ def create_fixed_assignment(employee_name: str, shift: str, day_of_week: str) ->
     if day_of_week.lower() not in Mappings.DAYS:
         raise ValueError(f"Día '{day_of_week}' no reconocido. Usa: {', '.join(Mappings.DAYS.keys())}")
 
-    return (Mappings.EMPLOYEES[employee_name], Mappings.SHIFT[shift.lower()], Mappings.DAYS[day_of_week.lower()])
+    return Mappings.EMPLOYEES[employee_name], Mappings.SHIFT[shift.lower()], Mappings.DAYS[day_of_week.lower()]
 
 
 def create_shift_constraint(shift: str, hard_min: int, soft_min: int, min_penalty: int, soft_max: int, hard_max: int,
