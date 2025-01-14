@@ -13,16 +13,28 @@ def create_request(employee_name: str, shift: str, day_of_week: str, weight: int
     Mappings.EMPLOYEES[employee_name], Mappings.SHIFT[shift.lower()], Mappings.DAYS[day_of_week.lower()], weight)
 
 
-def create_fixed_assignment(employee_name: str, shift: str, day_of_week: str) -> tuple:
+def create_fixed_assignment(employee_name: str, shift: str, day_of_week: str, week: int = 1) -> tuple:
+    """
+    Crea una asignación fija para un turno.
+
+    Args:
+        employee_name (str): Nombre del empleado.
+        shift (str): Turno ("libre", "mañana", "tarde", "noche").
+        day_of_week (str): Día de la semana ("lunes", "martes", etc.).
+        week (int): Número de la semana (opcional, por defecto 1).
+
+    Returns:
+        tuple: Asignación fija mapeada (ID empleado, ID turno, índice día).
+    """
     if employee_name not in Mappings.EMPLOYEES:
         raise ValueError(f"Empleado '{employee_name}' no encontrado.")
     if shift.lower() not in Mappings.SHIFT:
         raise ValueError(f"Turno '{shift}' no es válido. Usa 'mañana', 'tarde' o 'noche'.")
-    if day_of_week.lower() not in Mappings.DAYS:
-        raise ValueError(f"Día '{day_of_week}' no reconocido. Usa: {', '.join(Mappings.DAYS.keys())}")
 
-    return Mappings.EMPLOYEES[employee_name], Mappings.SHIFT[shift.lower()], Mappings.DAYS[day_of_week.lower()]
+    # Calcular el índice del día basado en la semana
+    day_index = Mappings.calculate_day_index(week, day_of_week)
 
+    return Mappings.EMPLOYEES[employee_name], Mappings.SHIFT[shift.lower()], day_index
 
 def create_shift_constraint(shift: str, hard_min: int, soft_min: int, min_penalty: int, soft_max: int, hard_max: int,
                             max_penalty: int) -> tuple:

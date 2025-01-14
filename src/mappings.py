@@ -8,3 +8,11 @@ class Mappings:
         "Maria": 4, "Miguel": 5, "Juan": 6, "Sara": 7
     }
     ID_TO_WORKER = {v: k for k, v in EMPLOYEES.items()}
+
+    @staticmethod
+    def calculate_day_index(week: int, day_of_week: str) -> int:
+        """Retorna l'índex absolut d'un dia basat en la setmana i el dia de la setmana."""
+        if day_of_week.lower() not in Mappings.DAYS:
+            raise ValueError(f"Día '{day_of_week}' no reconocido.")
+
+        return (week - 1) * 7 + Mappings.DAYS[day_of_week.lower()]

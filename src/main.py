@@ -18,23 +18,30 @@ def main(_):
     num_weeks = 3 # Setmanes per predir
 
     # Torns fixos (obligats)
+    # Valores base para generar fixed_assignments_week_1
+    values_week_1 = [
+        ("Pepito", "libre", "lunes", 1),
+        ("Juanita", "libre", "lunes", 1),
+        ("Carlos", "mañana", "lunes", 1),
+        ("Ana", "mañana", "lunes", 1),
+        ("Maria", "tarde", "lunes", 1),
+        ("Miguel", "tarde", "lunes", 1),
+        ("Juan", "tarde", "jueves", 1),
+        ("Sara", "noche", "lunes", 1),
+        ("Pepito", "mañana", "martes", 1),
+        ("Juanita", "mañana", "martes", 1),
+        ("Carlos", "tarde", "martes", 1),
+        ("Ana", "tarde", "martes", 1),
+        ("Maria", "tarde", "martes", 1),
+        ("Miguel", "libre", "martes", 1),
+        ("Juan", "libre", "martes", 1),
+        ("Sara", "noche", "martes", 1),
+    ]
+
     fixed_assignments = [
-        create_fixed_assignment("Pepito", "libre", "lunes"),
-        create_fixed_assignment("Juanita", "libre", "lunes"),
-        create_fixed_assignment("Carlos", "mañana", "lunes"),
-        create_fixed_assignment("Ana", "mañana", "lunes"),
-        create_fixed_assignment("Maria", "tarde", "lunes"),
-        create_fixed_assignment("Miguel", "tarde", "lunes"),
-        create_fixed_assignment("Juan", "tarde", "jueves"),
-        create_fixed_assignment("Sara", "noche", "lunes"),
-        create_fixed_assignment("Pepito", "mañana", "martes"),
-        create_fixed_assignment("Juanita", "mañana", "martes"),
-        create_fixed_assignment("Carlos", "tarde", "martes"),
-        create_fixed_assignment("Ana", "tarde", "martes"),
-        create_fixed_assignment("Maria", "tarde", "martes"),
-        create_fixed_assignment("Miguel", "libre", "martes"),
-        create_fixed_assignment("Juan", "libre", "martes"),
-        create_fixed_assignment("Sara", "noche", "martes"),
+        create_fixed_assignment(employee, shift, day, week)
+        for week in range(1, num_weeks + 1)  # Iterar sobre todas las semanas
+        for employee, shift, day, _ in values_week_1  # Reutilizar valores base
     ]
 
     # Preferències dels treballadors. IMPORTANT: Negatiu -> Torn desitjat. Positiu -> Torn no desitjat
